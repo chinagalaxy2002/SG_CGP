@@ -12,13 +12,16 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-def evaluate(checkpoint_path="checkpoints/best_sg_cgp.pt", model_cfg="sg_detr_dq_cgp", losses_cfg="sg_detr_dq_cgp", device="cuda:0"):
+def evaluate(checkpoint_path="checkpoints/best_sg_cgp.pt", split="test", model_cfg="sg_detr_dq_cgp", losses_cfg="sg_detr_dq_cgp", device="cuda:0"):
     if not os.path.isabs(checkpoint_path):
         checkpoint_path = os.path.join(PROJECT_ROOT, checkpoint_path)
         
+    ann_file = "data/highlight_test_with_gt.jsonl" if split == "test" else "data/highlight_val_release.jsonl"
+    
     print(f"\n=======================================================")
     print(f"Evaluating Model: SG-DETR + DQ-CGP")
     print(f"Checkpoint: {checkpoint_path}")
+    print(f"Target Split: {split.upper()} ({ann_file})")
     print(f"=======================================================")
     
     GlobalHydra.instance().clear()
@@ -27,6 +30,7 @@ def evaluate(checkpoint_path="checkpoints/best_sg_cgp.pt", model_cfg="sg_detr_dq
             "local=default",
             f"model={model_cfg}",
             f"losses={losses_cfg}",
+            f"data.annotation_path_test={ann_file}",
             "trainer.precision=bf16-mixed",
         ]
         cfg = hydra.compose(config_name="train.yaml", overrides=overrides)
@@ -81,6 +85,7 @@ def evaluate(checkpoint_path="checkpoints/best_sg_cgp.pt", model_cfg="sg_detr_dq
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate SG-DETR + DQ-CGP checkpoint")
     parser.add_argument("--checkpoint", type=str, default="checkpoints/best_sg_cgp.pt", help="Path to checkpoint")
+    parser.add_argument("--split", type=str, default="test", choices=["test", "val"], help="Dataset split to evaluate (test: highlight_test_with_gt.jsonl, val: highlight_val_release.jsonl)")
     parser.add_argument("--device", type=str, default="cuda:0", help="CUDA device (e.g. cuda:0)")
     args = parser.parse_args()
-    evaluate(checkpoint_path=args.checkpoint, device=args.device)
+    evaluate(checkpoint_path=args.checkpoint, split=args.split, device=args.device)

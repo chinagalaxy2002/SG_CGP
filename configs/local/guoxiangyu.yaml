@@ -17,10 +17,10 @@ data:
   num_workers: 8
   batch_size: 128
 
-  # Annotation files (stored in data/ directory)
+  # Annotation files
   annotation_path_train: ${paths.data_dir}/highlight_train_release.jsonl
   annotation_path_val: ${paths.data_dir}/highlight_val_release.jsonl
-  annotation_path_test: ${paths.data_dir}/highlight_val_release.jsonl
+  annotation_path_test: ${paths.data_dir}/highlight_test_with_gt.jsonl
 
   # Text features (InterVidV2 custom text, 512-dim)
   query_feat_dir_train: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/custom_text

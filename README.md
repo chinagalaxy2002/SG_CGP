@@ -2,7 +2,7 @@
 
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org/)
 [![Lightning](https://img.shields.io/badge/Lightning-2.0%2B-792ee5.svg)](https://lightning.ai/)
-[![Benchmark](https://img.shields.io/badge/QVHighlights-SOTA%2054.01%25%20mAP-brightgreen.svg)]()
+[![Benchmark](https://img.shields.io/badge/QVHighlights-SOTA%2052.06%25%20Test%20mAP-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 Official PyTorch implementation of **SG-DETR with Dynamic Query Candidate-Guided Prompting (DQ-CGP)** for Video Moment Retrieval (MR) and Highlight Detection (HD) on the **QVHighlights** benchmark.
@@ -23,9 +23,21 @@ Official PyTorch implementation of **SG-DETR with Dynamic Query Candidate-Guided
 
 ---
 
-## 📊 QVHighlights 官方基准测试结果 (Benchmark Results)
+## 📊 QVHighlights 官方基准全套评测结果 (Benchmark Results)
 
-在 QVHighlights 官方测试协议（`highlight_val_release.jsonl`）下的全套评测指标对比：
+### 1. 独立测试集结果 (Test Split: `highlight_test_with_gt.jsonl`, 1541 Samples)
+
+| 模型架构 (Model) | MR-mAP-Full_Avg (Core) ⭐ | MR-mAP-Full_Avg (COMB) | MR-R1-Full_0.5 | MR-R1-Full_mIoU | MR-mAP-Long_Avg | MR-mAP-Short_Avg | HL-HIT@1-VeryGood |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **官方 SG-DETR 原始权重 (`best_qvhighlights_2.pt`)** | 51.670% | 54.133% | 72.114% | 0.656 | 58.075% | 18.371% | 68.936% |
+| **SG-DETR Baseline (官方参数复现)** | 51.194% | 53.823% | 71.595% | 0.657 | 58.310% | 17.383% | 69.326% |
+| **SG-DETR + DQ-CGP (Ours)** 🚀 | <font color="green">**52.057%**</font> | <font color="green">**54.174%**</font> | 71.271% | <font color="green">**0.661**</font> | <font color="green">**61.286%**</font> | 17.689% | <font color="green">**69.780%**</font> |
+| **相对官方权重增益 ($\Delta$)** | <font color="green">**+0.387%**</font> | <font color="green">**+0.041%**</font> | - | <font color="green">**+0.005**</font> | <font color="green">**+3.211%**</font> | - | <font color="green">**+0.844%**</font> |
+| **相对本次 Baseline 增益 ($\Delta$)** | <font color="green">**+0.863%**</font> | <font color="green">**+0.351%**</font> | - | <font color="green">**+0.004**</font> | <font color="green">**+2.976%**</font> | <font color="green">**+0.306%**</font> | <font color="green">**+0.454%**</font> |
+
+---
+
+### 2. 验证集结果 (Validation Split: `highlight_val_release.jsonl`, 1549 Samples)
 
 | 模型架构 (Model) | MR-mAP-Full_Avg (Core) ⭐ | MR-mAP-Full_Avg (COMB) | MR-R1-Full_0.5 | MR-R1-Full_mIoU | MR-mAP-Long_Avg | MR-mAP-Short_Avg | HL-HIT@1-VeryGood |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -34,11 +46,6 @@ Official PyTorch implementation of **SG-DETR with Dynamic Query Candidate-Guided
 | **SG-DETR + DQ-CGP (Ours)** 🚀 | <font color="green">**54.014%**</font> | <font color="green">**55.636%**</font> | <font color="green">**73.161%**</font> | <font color="green">**0.677**</font> | <font color="green">**60.448%**</font> | 19.051% | 70.645% |
 | **相对官方权重增益 ($\Delta$)** | <font color="green">**+0.403%**</font> | <font color="green">**+0.307%**</font> | <font color="green">**+0.580%**</font> | <font color="green">**+0.006**</font> | <font color="green">**+1.233%**</font> | - | 持平 |
 | **相对本次 Baseline 增益 ($\Delta$)** | <font color="green">**+0.901%**</font> | <font color="green">**+0.413%**</font> | <font color="green">**+0.322%**</font> | <font color="green">**+0.005**</font> | <font color="green">**+1.111%**</font> | <font color="green">**+0.708%**</font> | 持平 |
-
-> **指标说明**：
-> - `MR-mAP-Full_Avg`：DETR Decoder 主预测头在 IoU [0.50:0.05:0.95] 上的平均 mAP（核心主指标）。
-> - `MR-mAP-Full_Avg-COMB`：结合主预测头与 ATSS 辅助头的加权框融合（WBF）最终集成指标。
-> - `MR-R1-Full_mIoU`：Top-1 预测片段与真值片段的平均时序交并比（mIoU）。
 
 ---
 
@@ -66,7 +73,7 @@ pip install -r requirements.txt
 ```
 SG_CGP/
 ├── checkpoints/
-│   └── best_sg_cgp.pt              # 训练好的最优权重 (54.01% mAP / 55.64% COMB, 56MB)
+│   └── best_sg_cgp.pt              # 训练好的最优权重 (52.06% Test / 54.01% Val, 56MB)
 ├── configs/
 │   ├── model/
 │   │   ├── sg_detr_dq_cgp.yaml     # DQ-CGP 模型架构配置
@@ -78,9 +85,9 @@ SG_CGP/
 │   │   └── default.yaml            # 数据与特征路径配置
 │   └── train.yaml / eval.yaml      # Hydra 入口配置
 ├── data/
-│   ├── highlight_train_release.jsonl   # 训练集标注
-│   ├── highlight_val_release.jsonl     # 验证集标注
-│   └── highlight_test_release.jsonl    # 测试集标注
+│   ├── highlight_train_release.jsonl   # 训练集标注 (7,217 条)
+│   ├── highlight_val_release.jsonl     # 验证集标注 (1,549 条)
+│   └── highlight_test_with_gt.jsonl    # 独立测试集标注带真值 (1,541 条)
 ├── experiment/                     # DQ-CGP 核心模块实现
 │   ├── dq_cgp.py                   # DETRQueryCGP 动态提示生成器
 │   ├── model.py                    # MRDETRWithDQ 模型主体
@@ -88,7 +95,7 @@ SG_CGP/
 │   ├── detector.py / decoder.py    # 适配后的检测器与解码器
 │   └── verify_all.py               # 17 项单元与集成验收测试套件
 ├── scripts/
-│   ├── eval.py                     # 一键评测复现脚本
+│   ├── eval.py                     # 一键评测复现脚本 (支持 --split test / val)
 │   └── train_sg_cgp.sh             # 一键从零训练脚本
 └── src/                            # 基础框架、损失与数据加载器
 ```
@@ -112,29 +119,33 @@ data:
 
 ## ⚡ 快速开始：一键评测复现 (Quick Start: Evaluation)
 
-使用本仓库附带的已训练最优检查点（`checkpoints/best_sg_cgp.pt`）一键复现全部测试指标：
+使用本仓库附带的已训练最优检查点（`checkpoints/best_sg_cgp.pt`）一键复现指标：
 
 ```bash
-python scripts/eval.py --checkpoint checkpoints/best_sg_cgp.pt --device cuda:0
+# 评测独立测试集 (Test Split: highlight_test_with_gt.jsonl)
+python scripts/eval.py --checkpoint checkpoints/best_sg_cgp.pt --split test --device cuda:0
+
+# 评测验证集 (Val Split: highlight_val_release.jsonl)
+python scripts/eval.py --checkpoint checkpoints/best_sg_cgp.pt --split val --device cuda:0
 ```
 
-预期终端输出：
+测试集预期终端输出：
 ```
 ==================================================================================
 Metric                                             | Value (%)           
 ----------------------------------------------------------------------------------
-MR-mAP-Full_Avg (Core Main Metric)                 | 54.016
-MR-mAP-Full_Avg-COMB (WBF Post-Processing Fusion)  | 55.631
-MR-R1-Full_0.5 (Top-1 Coarse Recall)               | 73.161
-MR-R1-Full_0.7 (Top-1 Strict Recall)               | 57.742
-MR-R1-Full_mIoU (Mean IoU Overlap)                 | 0.677
-MR-mAP-Full_0.5 (IoU@0.5 mAP)                      | 73.139
-MR-mAP-Full_0.75 (IoU@0.75 Strict mAP)             | 54.804
-MR-mAP-Short_Avg (Short Moments <=10s)             | 19.014
-MR-mAP-Middle_Avg (Middle Moments 10-30s)          | 54.329
-MR-mAP-Long_Avg (Long Moments >30s)                | 60.448
-HL-HIT@1-VeryGood (Highlight Top-1 Hit)            | 70.645
-HL-mAP-VeryGood (Highlight mAP)                    | 0.435
+MR-mAP-Full_Avg (Core Main Metric)                 | 52.057
+MR-mAP-Full_Avg-COMB (WBF Post-Processing Fusion)  | 54.174
+MR-R1-Full_0.5 (Top-1 Coarse Recall)               | 71.271
+MR-R1-Full_0.7 (Top-1 Strict Recall)               | 56.096
+MR-R1-Full_mIoU (Mean IoU Overlap)                 | 0.661
+MR-mAP-Full_0.5 (IoU@0.5 mAP)                      | 71.415
+MR-mAP-Full_0.75 (IoU@0.75 Strict mAP)             | 52.551
+MR-mAP-Short_Avg (Short Moments <=10s)             | 17.689
+MR-mAP-Middle_Avg (Middle Moments 10-30s)          | 49.530
+MR-mAP-Long_Avg (Long Moments >30s)                | 61.286
+HL-HIT@1-VeryGood (Highlight Top-1 Hit)            | 69.780
+HL-mAP-VeryGood (Highlight mAP)                    | 0.432
 ==================================================================================
 ```
 

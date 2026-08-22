@@ -1,0 +1,48 @@
+# @package _global_
+# Local config for guoxiangyu's machine (RTX 3090 x2)
+# Configured strictly according to official SG-DETR pretraining recommendations:
+# Official Total Batch Size = 256 (Dual GPU: 128 per GPU, or Single GPU: 128 + accum_grad=2)
+
+defaults:
+  - override /paths: default
+  - override /data: pretrain
+  - override /trainer: gpu_pretrain_150
+  - override /model: pretrain
+  - override /optimizer: pretrain_150
+  - override /callbacks: pretrain_no_rich
+
+paths:
+  root_dir: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr
+  data_dir: ${paths.root_dir}/Pretrain/
+  log_dir: ${paths.root_dir}/logs/
+
+data:
+  num_workers: 8
+  batch_size: 128  # Dual-GPU DDP -> Effective Total Batch Size = 256 (Official recommendation)
+
+  # Annotation paths
+  annotation_path_train: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/Pretrain/pretrain_annotation_150k.jsonl
+  annotation_path_val: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/highlight_test_with_gt.jsonl
+  annotation_path_test: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/highlight_test_with_gt.jsonl
+
+  # Caption paths
+  query_feat_dir_train: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/Pretrain/pretrain_custom_features/pretrain_text_features
+  query_feat_dir_val: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/custom_text
+  query_feat_dir_test: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/custom_text
+
+  # Video paths
+  video_feat_dir_train: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/Pretrain/pretrain_custom_features/video
+  video_feat_dir_val: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/video
+  video_feat_dir_test: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/video
+
+  # Audio paths
+  audio_feat_dir_train: null
+  audio_feat_dir_val: null
+  audio_feat_dir_test: null
+
+trainer:
+  precision: bf16-mixed
+  devices: 2
+  strategy: ddp_find_unused_parameters_true
+
+is_local_run: True
