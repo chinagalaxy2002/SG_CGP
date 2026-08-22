@@ -1,0 +1,50 @@
+# @package _global_
+# Local config for running on GPU with custom features
+defaults:
+  - override /paths: default
+  - override /data: qvhighlights
+  - override /trainer: gpu
+  - override /model: sg_detr_dq_cgp
+  - override /losses: sg_detr_dq_cgp
+  - override /callbacks: no_rich
+
+paths:
+  root_dir: .
+  data_dir: ${paths.root_dir}/data
+  log_dir: ${paths.root_dir}/logs
+
+data:
+  num_workers: 8
+  batch_size: 128
+
+  # Annotation files (stored in data/ directory)
+  annotation_path_train: ${paths.data_dir}/highlight_train_release.jsonl
+  annotation_path_val: ${paths.data_dir}/highlight_val_release.jsonl
+  annotation_path_test: ${paths.data_dir}/highlight_val_release.jsonl
+
+  # Text features (InterVidV2 custom text, 512-dim)
+  query_feat_dir_train: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/custom_text
+  query_feat_dir_val: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/custom_text
+  query_feat_dir_test: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/custom_text
+
+  # Video features (InterVidV2-1b, 512-dim, +2 TEF = 514)
+  video_feat_dir_train: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/video
+  video_feat_dir_val: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/video
+  video_feat_dir_test: /home/guoxiangyu/VLMbasedIter_momentretrival/sg-detr/features/custom_features/video
+
+  # Audio features
+  audio_feat_dir_train: null
+  audio_feat_dir_val: null
+  audio_feat_dir_test: null
+
+model:
+  runner:
+    model:
+      vid_dim: 514   # 512 (InterVidV2) + 2 (TEF)
+      txt_dim: 512   # InterVidV2 text features
+      aud_dim: 770   # unused
+
+trainer:
+  precision: bf16-mixed
+
+is_local_run: True

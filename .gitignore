@@ -1,0 +1,27 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# PyTorch Lightning & Experiment logs
+logs/
+.hydra/
+.clearml/
+*.log
+
+# Checkpoints (large intermediary saves)
+*.ckpt
+
+# Datasets and large feature archives
+features/custom_features/
+features/*.zip
+features/*.tar*
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~
