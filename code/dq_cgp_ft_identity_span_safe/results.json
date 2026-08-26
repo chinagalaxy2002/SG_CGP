@@ -1,0 +1,40 @@
+{
+  "checkpoint": "identity_span_safe_dq_cgp_epoch053_weights.pt",
+  "seed": 40,
+  "official_test_split": {
+    "annotation": "data/highlight_test_with_gt.jsonl",
+    "samples": 1541,
+    "baseline_epoch019": {
+      "MR-mAP-Full_Avg": 56.687447,
+      "MR-mAP-Full_Avg-AUX": 58.338495,
+      "MR-mAP-Full_Avg-COMB": 58.790758,
+      "MR-R1-Full_0.5": 73.476006,
+      "MR-R1-Full_0.7": 58.495461,
+      "MR-R1-Full_mIoU": 0.685154,
+      "MR-mAP-Long_Avg": 63.608021,
+      "MR-mAP-Middle_Avg": 55.714795,
+      "MR-mAP-Short_Avg": 20.102304,
+      "HL-HIT@1-VeryGood": 71.400780,
+      "HL-mAP-VeryGood": 0.450877
+    },
+    "identity_span_safe_dq_cgp_epoch053": {
+      "MR-mAP-Full_Avg": 57.029382,
+      "MR-mAP-Full_Avg-AUX": 58.250038,
+      "MR-mAP-Full_Avg-COMB": 58.912251,
+      "MR-R1-Full_0.5": 73.605705,
+      "MR-R1-Full_0.7": 58.690010,
+      "MR-R1-Full_mIoU": 0.686600,
+      "MR-mAP-Long_Avg": 63.200328,
+      "MR-mAP-Middle_Avg": 56.053451,
+      "MR-mAP-Short_Avg": 21.153832,
+      "HL-HIT@1-VeryGood": 70.881966,
+      "HL-mAP-VeryGood": 0.448615
+    }
+  },
+  "validation_split_via_test_loop": {
+    "annotation": "data/highlight_val_release.jsonl",
+    "samples": 1549,
+    "baseline_epoch019_MR-mAP-Full_Avg": 58.421156,
+    "identity_span_safe_epoch053_MR-mAP-Full_Avg": 58.585316
+  }
+}

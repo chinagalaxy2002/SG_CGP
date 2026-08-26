@@ -1,5 +1,8 @@
 # SG-DETR + DQ-CGP: Candidate-Specific Dynamic Prompt Generation for Temporal Video Grounding & Highlight Detection
 
+> [!IMPORTANT]
+> 当前推荐复现版本是 **Baseline pretrain → identity-start / span-safe DQ-CGP finetune**。其官方 QVHighlights test 主指标为 **57.029 MR-mAP Full Avg**，相同评测器下 Baseline 为 56.687。完整训练轨迹、tmux 指令、独立 test/val 评测口径与 checkpoint 说明见 [`code/dq_cgp_ft_identity_span_safe/README.md`](code/dq_cgp_ft_identity_span_safe/README.md)。下文保留的是仓库早期 DQ-CGP 版本记录。
+
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org/)
 [![Lightning](https://img.shields.io/badge/Lightning-2.0%2B-792ee5.svg)](https://lightning.ai/)
 [![Benchmark](https://img.shields.io/badge/QVHighlights-SOTA%2052.06%25%20Test%20mAP-brightgreen.svg)]()

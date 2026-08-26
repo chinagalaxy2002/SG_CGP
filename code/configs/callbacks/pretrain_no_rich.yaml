@@ -1,0 +1,4 @@
+defaults:
+  - lr_monitor_callback
+  - model_checkpoint
+  - _self_

@@ -1,0 +1,45 @@
+# @package _global_
+# Portable QVHighlights configuration for the released identity/span-safe run.
+defaults:
+  - override /paths: default
+  - override /data: qvhighlights
+  - override /trainer: gpu
+  - override /model: default
+  - override /callbacks: no_rich
+
+paths:
+  root_dir: ${oc.env:SG_CGP_ROOT}
+  data_dir: ${paths.root_dir}/data/
+  log_dir: ${paths.root_dir}/logs/
+
+data:
+  num_workers: ${oc.decode:${oc.env:SG_CGP_NUM_WORKERS,8}}
+  batch_size: 128
+
+  annotation_path_train: ${paths.data_dir}/highlight_train_release.jsonl
+  annotation_path_val: ${paths.data_dir}/highlight_val_release.jsonl
+  annotation_path_test: ${paths.data_dir}/highlight_test_with_gt.jsonl
+
+  query_feat_dir_train: ${oc.env:SG_CGP_FEATURE_ROOT}/custom_text
+  query_feat_dir_val: ${oc.env:SG_CGP_FEATURE_ROOT}/custom_text
+  query_feat_dir_test: ${oc.env:SG_CGP_FEATURE_ROOT}/custom_text
+
+  video_feat_dir_train: ${oc.env:SG_CGP_FEATURE_ROOT}/video
+  video_feat_dir_val: ${oc.env:SG_CGP_FEATURE_ROOT}/video
+  video_feat_dir_test: ${oc.env:SG_CGP_FEATURE_ROOT}/video
+
+  audio_feat_dir_train: null
+  audio_feat_dir_val: null
+  audio_feat_dir_test: null
+
+model:
+  runner:
+    model:
+      vid_dim: 514
+      txt_dim: 512
+      aud_dim: 770
+
+trainer:
+  precision: bf16-mixed
+
+is_local_run: true

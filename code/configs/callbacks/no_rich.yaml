@@ -1,0 +1,12 @@
+# Same as default but without RichProgressBar (fixes non-interactive terminal bug)
+defaults:
+  - early_stopping
+  - lr_monitor_callback
+  - model_checkpoint
+  - _self_
+
+matcher_callback:
+  _target_: src.callbacks.matcher_callback.MatcherCallback
+
+offset_callback:
+  _target_: src.callbacks.offset_callback.OffsetCallback
