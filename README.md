@@ -5,14 +5,67 @@
 
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org/)
 [![Lightning](https://img.shields.io/badge/Lightning-2.0%2B-792ee5.svg)](https://lightning.ai/)
-[![Benchmark](https://img.shields.io/badge/QVHighlights-SOTA%2052.06%25%20Test%20mAP-brightgreen.svg)]()
+[![Benchmark](https://img.shields.io/badge/QVHighlights%20Test%20mAP-57.03%25-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 Official PyTorch implementation of **SG-DETR with Dynamic Query Candidate-Guided Prompting (DQ-CGP)** for Video Moment Retrieval (MR) and Highlight Detection (HD) on the **QVHighlights** benchmark.
 
 ---
 
-## 🌟 核心创新与架构设计 (Key Highlights & Methodology)
+## 🏆 当前最佳版本：Baseline Pretrain → Identity/Span-safe DQ-CGP Finetune
+
+当前推荐版本以 Baseline pretrain `epoch=018` 为初始化，固定随机种子 `40` 进行 DQ-CGP 微调，没有进行随机种子搜索。相较早期版本，该方案采用严格 identity start、最大绝对值为 `0.01` 的残差门控，并只修改最终 regular queries 的分类特征；span、reference、quality 和辅助分支保持 Baseline forward 路径。同时使用 length-balanced binding loss 与 partial-boundary KL，降低从 Baseline 切换到 DQ-CGP 时的优化扰动。
+
+### QVHighlights 官方测试集结果
+
+测试集为 `data/highlight_test_with_gt.jsonl`，共 1,541 条。Baseline 与 DQ-CGP 使用相同特征、指标实现、后处理、batch size 和精度设置重新评测。
+
+| 模型 | MR-mAP Full Avg | MR-mAP AUX | MR-mAP COMB | MR-R1@0.5 | MR-R1@0.7 | MR-R1 mIoU | Long mAP | Middle mAP | Short mAP | HL HIT@1 VG |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline finetune `epoch=19` | 56.687 | **58.338** | 58.791 | 73.476 | 58.495 | 0.685154 | **63.608** | 55.715 | 20.102 | **71.401** |
+| Identity/Span-safe DQ-CGP `epoch=53` | **57.029** | 58.250 | **58.912** | **73.606** | **58.690** | **0.686600** | 63.200 | **56.053** | **21.154** | 70.882 |
+| DQ-CGP 相对 Baseline | **+0.342** | -0.088 | **+0.121** | **+0.130** | **+0.195** | **+0.001446** | -0.408 | **+0.339** | **+1.052** | -0.519 |
+
+该版本在主指标、COMB、R1、Middle 和 Short 上超过 Baseline，主要增益集中在短时刻检索；Long mAP、AUX 和 highlight 指标没有全面领先，因此这里不宣称所有指标均优于 Baseline。
+
+### Validation 结果
+
+验证集为 `data/highlight_val_release.jsonl`，共 1,549 条。
+
+| 模型 | MR-mAP Full Avg | MR-mAP AUX | MR-mAP COMB | MR-R1@0.5 | MR-R1 mIoU | Long mAP | Middle mAP | Short mAP |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline finetune `epoch=19` | 58.421 | **59.624** | **60.398** | **76.387** | **0.711541** | 63.977 | **59.972** | 19.991 |
+| Identity/Span-safe DQ-CGP `epoch=53` | **58.585** | 59.253 | 60.313 | 76.065 | 0.709499 | **64.034** | 59.545 | **21.166** |
+| DQ-CGP 相对 Baseline | **+0.164** | -0.371 | -0.085 | -0.323 | -0.002042 | **+0.057** | -0.427 | **+1.176** |
+
+> [!NOTE]
+> 历史运行的 `local=guoxiangyu` 曾将 `annotation_path_test` 指向 validation，因此旧日志中的 `test/*` 实际可能是 validation 指标。上面两张表已经按官方 test 和 validation 标注文件重新评测并严格区分。
+
+### 检查点、训练与测试
+
+- 最佳 DQ-CGP 权重：[`checkpoints/identity_span_safe_dq_cgp_epoch053_weights.pt`](checkpoints/identity_span_safe_dq_cgp_epoch053_weights.pt)
+- Baseline 初始化权重：[`checkpoints/baseline_pretrain_epoch018_weights.pt`](checkpoints/baseline_pretrain_epoch018_weights.pt)
+- 完整训练轨迹和 tmux 指令：[`code/dq_cgp_ft_identity_span_safe/README.md`](code/dq_cgp_ft_identity_span_safe/README.md)
+- 机器可读结果：[`code/dq_cgp_ft_identity_span_safe/results.json`](code/dq_cgp_ft_identity_span_safe/results.json)
+- 文件校验值：[`CHECKSUMS.sha256`](CHECKSUMS.sha256)
+
+准备好 `features/custom_features/custom_text/` 和 `features/custom_features/video/` 后，可直接复测发布权重：
+
+```bash
+export SG_CGP_ROOT="$PWD"
+export SG_CGP_FEATURE_ROOT="$PWD/features/custom_features"
+
+python code/dq_cgp_ft_identity_span_safe/eval_weights.py \
+  --checkpoint checkpoints/identity_span_safe_dq_cgp_epoch053_weights.pt \
+  --baseline-checkpoint checkpoints/baseline_pretrain_epoch018_weights.pt \
+  --split test \
+  --gpu 0 \
+  --batch-size 128
+```
+
+---
+
+## 🌟 早期 DQ-CGP 版本：核心创新与架构设计 (Historical Methodology)
 
 在标准 DETR 时序片段检索架构中，跨解码器层（Decoder Layers）的时刻查询向量（Moment Queries）通常共享全局静态表征，缺乏在迭代回归过程中结合具体候选片段（Candidate Proposal）动态调整时序上下文的能力。
 
@@ -26,7 +79,7 @@ Official PyTorch implementation of **SG-DETR with Dynamic Query Candidate-Guided
 
 ---
 
-## 📊 QVHighlights 官方基准全套评测结果 (Benchmark Results)
+## 📊 早期 DQ-CGP 版本评测结果 (Historical Benchmark Results)
 
 ### 1. 独立测试集结果 (Test Split: `highlight_test_with_gt.jsonl`, 1541 Samples)
 
@@ -120,7 +173,7 @@ data:
 
 ---
 
-## ⚡ 快速开始：一键评测复现 (Quick Start: Evaluation)
+## ⚡ 早期版本：一键评测复现 (Historical Evaluation)
 
 使用本仓库附带的已训练最优检查点（`checkpoints/best_sg_cgp.pt`）一键复现指标：
 
@@ -154,7 +207,7 @@ HL-mAP-VeryGood (Highlight mAP)                    | 0.432
 
 ---
 
-## 🚀 从零训练复现 (Training from Scratch)
+## 🚀 早期版本：从零训练复现 (Historical Training)
 
 在 QVHighlights 上使用官方超参数从零训练 SG-DETR + DQ-CGP：
 
