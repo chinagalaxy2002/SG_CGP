@@ -38,6 +38,25 @@ Official PyTorch implementation of **SG-DETR with Dynamic Query Candidate-Guided
 | Identity/Span-safe DQ-CGP `epoch=53` | **58.585** | 59.253 | 60.313 | 76.065 | 0.709499 | **64.034** | 59.545 | **21.166** |
 | DQ-CGP 相对 Baseline | **+0.164** | -0.371 | -0.085 | -0.323 | -0.002042 | **+0.057** | -0.427 | **+1.176** |
 
+#### Training-only Native Binding 系数消融
+
+下面新增的是训练过程中 TensorBoard `val/*` 的最佳 validation event，用于检验
+“只保留 D1 原生 cross-attention binding loss、零新增参数”的贡献。它没有经过上表的
+独立 Lightning test-loop 复测，因此保留为单独口径，不与上表数值混算。
+
+| 模型 | 训练状态 | 最佳 epoch | MR-mAP Full Avg | MR-mAP AUX | MR-mAP COMB | MR-R1@0.5 | MR-R1@0.7 | MR-R1 mIoU | Long mAP | Middle mAP | Short mAP | HL HIT@1 VG |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline finetune | 完整 160 次 validation | 19 | 58.398 | **59.594** | **60.375** | 76.387 | 63.097 | **0.711541** | 63.977 | **59.972** | 19.938 | 75.032 |
+| Native Bind `0.2` | 用户停止，158 次 validation | 18 | **58.532** | 59.363 | 60.290 | 76.065 | **63.161** | 0.710502 | **64.445** | 59.111 | **20.987** | **75.548** |
+| `0.2` 相对 Baseline | — | — | **+0.135** | -0.231 | -0.086 | -0.323 | **+0.065** | -0.001039 | **+0.468** | -0.860 | **+1.049** | **+0.516** |
+| Native Bind `0.4` | 用户停止，135 次 validation | 18 | 58.231 | 59.398 | 60.139 | **76.452** | 62.968 | 0.706663 | 64.200 | 58.878 | 20.559 | 75.226 |
+| `0.4` 相对 Baseline | — | — | -0.167 | -0.196 | -0.236 | **+0.065** | -0.129 | -0.004878 | **+0.223** | -1.093 | **+0.621** | **+0.194** |
+
+单 seed (`40`) 下，`0.2` 的主指标最好，较训练期 Baseline 提高 `0.135`；`0.4`
+未超过 Baseline。实现、tmux 启动方式和完整精度结果见
+[`code/sg_native_binding_validation_lab/README.md`](code/sg_native_binding_validation_lab/README.md)
+与 [`results.json`](code/sg_native_binding_validation_lab/results.json)。
+
 > [!NOTE]
 > 历史运行的 `local=guoxiangyu` 曾将 `annotation_path_test` 指向 validation，因此旧日志中的 `test/*` 实际可能是 validation 指标。上面两张表已经按官方 test 和 validation 标注文件重新评测并严格区分。
 
