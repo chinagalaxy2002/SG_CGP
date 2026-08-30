@@ -18,7 +18,7 @@ Official PyTorch implementation of **SG-DETR with Dynamic Query Candidate-Guided
 
 ### QVHighlights 官方测试集结果
 
-测试集为 `data/highlight_test_with_gt.jsonl`，共 1,541 条。Baseline 与 DQ-CGP 使用相同特征、指标实现、后处理、batch size 和精度设置重新评测。
+测试集为 `data/highlight_test_with_gt.jsonl`，共 1,542 条。Baseline 与 DQ-CGP 使用相同特征、指标实现、后处理、batch size 和精度设置重新评测。
 
 | 模型 | MR-mAP Full Avg | MR-mAP AUX | MR-mAP COMB | MR-R1@0.5 | MR-R1@0.7 | MR-R1 mIoU | Long mAP | Middle mAP | Short mAP | HL HIT@1 VG |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -30,7 +30,7 @@ Official PyTorch implementation of **SG-DETR with Dynamic Query Candidate-Guided
 
 ### Validation 结果
 
-验证集为 `data/highlight_val_release.jsonl`，共 1,549 条。
+验证集为 `data/highlight_val_release.jsonl`，共 1,550 条。
 
 | 模型 | MR-mAP Full Avg | MR-mAP AUX | MR-mAP COMB | MR-R1@0.5 | MR-R1 mIoU | Long mAP | Middle mAP | Short mAP |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -40,22 +40,45 @@ Official PyTorch implementation of **SG-DETR with Dynamic Query Candidate-Guided
 
 #### Training-only Native Binding 系数消融
 
-下面新增的是训练过程中 TensorBoard `val/*` 的最佳 validation event，用于检验
-“只保留 D1 原生 cross-attention binding loss、零新增参数”的贡献。它没有经过上表的
-独立 Lightning test-loop 复测，因此保留为单独口径，不与上表数值混算。
+该实验只保留 D1 原生 cross-attention binding loss，增加 `0` 个可训练参数。下面
+三组 checkpoint 均使用新增的 plain-SG-DETR 评测入口、相同特征、后处理、batch
+size 与 `bf16-mixed` 精度重新测试。
 
-| 模型 | 训练状态 | 最佳 epoch | MR-mAP Full Avg | MR-mAP AUX | MR-mAP COMB | MR-R1@0.5 | MR-R1@0.7 | MR-R1 mIoU | Long mAP | Middle mAP | Short mAP | HL HIT@1 VG |
-| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline finetune | 完整 160 次 validation | 19 | 58.398 | **59.594** | **60.375** | 76.387 | 63.097 | **0.711541** | 63.977 | **59.972** | 19.938 | 75.032 |
-| Native Bind `0.2` | 用户停止，158 次 validation | 18 | **58.532** | 59.363 | 60.290 | 76.065 | **63.161** | 0.710502 | **64.445** | 59.111 | **20.987** | **75.548** |
-| `0.2` 相对 Baseline | — | — | **+0.135** | -0.231 | -0.086 | -0.323 | **+0.065** | -0.001039 | **+0.468** | -0.860 | **+1.049** | **+0.516** |
-| Native Bind `0.4` | 用户停止，135 次 validation | 18 | 58.231 | 59.398 | 60.139 | **76.452** | 62.968 | 0.706663 | 64.200 | 58.878 | 20.559 | 75.226 |
-| `0.4` 相对 Baseline | — | — | -0.167 | -0.196 | -0.236 | **+0.065** | -0.129 | -0.004878 | **+0.223** | -1.093 | **+0.621** | **+0.194** |
+##### Official test（1,542 条）
 
-单 seed (`40`) 下，`0.2` 的主指标最好，较训练期 Baseline 提高 `0.135`；`0.4`
-未超过 Baseline。实现、tmux 启动方式和完整精度结果见
+| 模型 | MR-mAP Full Avg | MR-mAP AUX | MR-mAP COMB | MR-R1@0.5 | MR-R1@0.7 | MR-R1 mIoU | Long mAP | Middle mAP | Short mAP | HL HIT@1 VG |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline finetune `epoch=19` | 56.687 | **58.338** | 58.791 | **73.476** | 58.495 | **0.685154** | 63.608 | **55.715** | 20.102 | **71.401** |
+| Native Bind `0.2`, `epoch=18` | 56.526 | 58.239 | **58.957** | 72.633 | 57.977 | 0.676889 | 62.964 | 55.514 | 20.203 | 69.455 |
+| `0.2` 相对 Baseline | -0.161 | -0.099 | **+0.167** | -0.843 | -0.519 | -0.008265 | -0.644 | -0.201 | **+0.101** | -1.946 |
+| Native Bind `0.4`, `epoch=18` | **56.695** | 57.996 | 58.633 | 72.957 | **59.274** | 0.683313 | **63.700** | 55.171 | **20.791** | 69.974 |
+| `0.4` 相对 Baseline | **+0.008** | -0.343 | -0.158 | -0.519 | **+0.778** | -0.001841 | **+0.092** | -0.544 | **+0.688** | -1.427 |
+
+##### Validation（1,550 条）
+
+| 模型 | MR-mAP Full Avg | MR-mAP AUX | MR-mAP COMB | MR-R1@0.5 | MR-R1@0.7 | MR-R1 mIoU | Long mAP | Middle mAP | Short mAP | HL HIT@1 VG |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline finetune `epoch=19` | 58.401 | **59.607** | **60.383** | 76.387 | 63.097 | **0.711541** | 63.977 | **59.972** | 19.911 | 75.032 |
+| Native Bind `0.2`, `epoch=18` | **58.548** | 59.374 | 60.297 | 76.065 | **63.161** | 0.710502 | **64.445** | 59.111 | **21.002** | **75.548** |
+| `0.2` 相对 Baseline | **+0.147** | -0.234 | -0.086 | -0.323 | **+0.065** | -0.001039 | **+0.468** | -0.860 | **+1.091** | **+0.516** |
+| Native Bind `0.4`, `epoch=18` | 58.219 | 59.404 | 60.144 | **76.452** | 62.968 | 0.706663 | 64.200 | 58.878 | 20.530 | 75.226 |
+| `0.4` 相对 Baseline | -0.182 | -0.203 | -0.239 | **+0.065** | -0.129 | -0.004878 | **+0.223** | -1.093 | **+0.618** | **+0.194** |
+
+结果具有 split sensitivity：`0.2` 提高 validation 主指标但降低 official-test 主指标；
+`0.4` 在 official test 上仅高 `0.008`，可视为基本持平，并且 validation 下降。
+因此当前结果不支持“Native Binding 稳定提高 SG-DETR 主指标”的结论。
+
+##### 对应训练与评测脚本
+
+| 对象 | 训练启动脚本 | 独立评测命令（validation 时把 `test` 改为 `val`） |
+| :--- | :--- | :--- |
+| Baseline `epoch=19` | 使用仓库既有 Baseline 微调流程 | `python -m code.sg_native_binding_validation_lab.eval_checkpoint --checkpoint <BASELINE_EPOCH019.ckpt> --split test --gpu 0` |
+| Native Bind `0.2` | `TARGET_GPU=0 NATIVE_BIND_COEF=0.2 bash code/sg_native_binding_validation_lab/run_qvhighlights.sh` | `python -m code.sg_native_binding_validation_lab.eval_checkpoint --checkpoint <NATIVE_0P2_EPOCH018.ckpt> --split test --gpu 0` |
+| Native Bind `0.4` | `TARGET_GPU=1 NATIVE_BIND_COEF=0.4 bash code/sg_native_binding_validation_lab/run_qvhighlights.sh` | `python -m code.sg_native_binding_validation_lab.eval_checkpoint --checkpoint <NATIVE_0P4_EPOCH018.ckpt> --split test --gpu 1` |
+
+训练期曲线、完整精度结果、tmux 启动方式与脚本说明见
 [`code/sg_native_binding_validation_lab/README.md`](code/sg_native_binding_validation_lab/README.md)
-与 [`results.json`](code/sg_native_binding_validation_lab/results.json)。
+和 [`results.json`](code/sg_native_binding_validation_lab/results.json)。
 
 > [!NOTE]
 > 历史运行的 `local=guoxiangyu` 曾将 `annotation_path_test` 指向 validation，因此旧日志中的 `test/*` 实际可能是 validation 指标。上面两张表已经按官方 test 和 validation 标注文件重新评测并严格区分。

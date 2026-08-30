@@ -123,5 +123,156 @@
       }
     }
   },
-  "conclusion": "coefficient 0.2 is preferred among the tested native-binding settings"
+  "independent_evaluation": {
+    "recorded_at": "2026-08-30",
+    "evaluator": "code/sg_native_binding_validation_lab/eval_checkpoint.py",
+    "shared_protocol": {
+      "model": "plain SG-DETR finetune",
+      "configured_batch_size": 128,
+      "evaluation_batch_size": 512,
+      "precision": "bf16-mixed",
+      "seed": 40,
+      "checkpoint_loading": "strict runner state_dict",
+      "extra_trainable_parameters": 0
+    },
+    "official_test": {
+      "annotation": "data/highlight_test_with_gt.jsonl",
+      "samples": 1542,
+      "baseline_epoch019": {
+        "MR-mAP-Full_Avg": 56.68744726784166,
+        "MR-mAP-Full_Avg-AUX": 58.33849495555536,
+        "MR-mAP-Full_Avg-COMB": 58.790758354549965,
+        "MR-R1-Full_0.5": 73.47600555419922,
+        "MR-R1-Full_0.7": 58.495460510253906,
+        "MR-R1-Full_mIoU": 0.6851537231006707,
+        "MR-mAP-Long_Avg": 63.60802085061667,
+        "MR-mAP-Middle_Avg": 55.714794973544976,
+        "MR-mAP-Short_Avg": 20.102304428890484,
+        "HL-HIT@1-VeryGood": 71.4007797241211,
+        "HL-mAP-VeryGood": 0.4508768618106842
+      },
+      "native_binding_0.2_epoch018": {
+        "MR-mAP-Full_Avg": 56.52633758540165,
+        "MR-mAP-Full_Avg-AUX": 58.23924321157583,
+        "MR-mAP-Full_Avg-COMB": 58.95728771765228,
+        "MR-R1-Full_0.5": 72.63294219970703,
+        "MR-R1-Full_0.7": 57.97665023803711,
+        "MR-R1-Full_mIoU": 0.6768890647756354,
+        "MR-mAP-Long_Avg": 62.96357364083845,
+        "MR-mAP-Middle_Avg": 55.513824143692574,
+        "MR-mAP-Short_Avg": 20.203074518472945,
+        "HL-HIT@1-VeryGood": 69.45525360107422,
+        "HL-mAP-VeryGood": 0.447052925825119
+      },
+      "native_binding_0.2_delta_from_baseline": {
+        "MR-mAP-Full_Avg": -0.16110968244001356,
+        "MR-mAP-Full_Avg-AUX": -0.0992517439795293,
+        "MR-mAP-Full_Avg-COMB": 0.16652936310231325,
+        "MR-R1-Full_0.5": -0.8430633544921875,
+        "MR-R1-Full_0.7": -0.5188102722167969,
+        "MR-R1-Full_mIoU": -0.008264658325035312,
+        "MR-mAP-Long_Avg": -0.644447209778221,
+        "MR-mAP-Middle_Avg": -0.20097082985240178,
+        "MR-mAP-Short_Avg": 0.10077008958246125,
+        "HL-HIT@1-VeryGood": -1.945526123046875,
+        "HL-mAP-VeryGood": -0.0038239359855651855
+      },
+      "native_binding_0.4_epoch018": {
+        "MR-mAP-Full_Avg": 56.695441921364306,
+        "MR-mAP-Full_Avg-AUX": 57.99586816063793,
+        "MR-mAP-Full_Avg-COMB": 58.63267270519679,
+        "MR-R1-Full_0.5": 72.95719909667969,
+        "MR-R1-Full_0.7": 59.27367401123047,
+        "MR-R1-Full_mIoU": 0.6833128230206807,
+        "MR-mAP-Long_Avg": 63.700158315358664,
+        "MR-mAP-Middle_Avg": 55.171129908103595,
+        "MR-mAP-Short_Avg": 20.790596085586664,
+        "HL-HIT@1-VeryGood": 69.97406005859375,
+        "HL-mAP-VeryGood": 0.4479048252105713
+      },
+      "native_binding_0.4_delta_from_baseline": {
+        "MR-mAP-Full_Avg": 0.007994653522644057,
+        "MR-mAP-Full_Avg-AUX": -0.34262679491742887,
+        "MR-mAP-Full_Avg-COMB": -0.15808564935317548,
+        "MR-R1-Full_0.5": -0.5188064575195312,
+        "MR-R1-Full_0.7": 0.7782135009765625,
+        "MR-R1-Full_mIoU": -0.0018409000799899378,
+        "MR-mAP-Long_Avg": 0.09213746474199525,
+        "MR-mAP-Middle_Avg": -0.543665065441381,
+        "MR-mAP-Short_Avg": 0.6882916566961796,
+        "HL-HIT@1-VeryGood": -1.4267196655273438,
+        "HL-mAP-VeryGood": -0.002972036600112915
+      }
+    },
+    "validation": {
+      "annotation": "data/highlight_val_release.jsonl",
+      "samples": 1550,
+      "baseline_epoch019": {
+        "MR-mAP-Full_Avg": 58.40093310454409,
+        "MR-mAP-Full_Avg-AUX": 59.60742505526703,
+        "MR-mAP-Full_Avg-COMB": 60.382802466087995,
+        "MR-R1-Full_0.5": 76.38710021972656,
+        "MR-R1-Full_0.7": 63.096778869628906,
+        "MR-R1-Full_mIoU": 0.7115414294556425,
+        "MR-mAP-Long_Avg": 63.976916376306626,
+        "MR-mAP-Middle_Avg": 59.971572595135825,
+        "MR-mAP-Short_Avg": 19.911298379750765,
+        "HL-HIT@1-VeryGood": 75.03225708007812,
+        "HL-mAP-VeryGood": 0.4553298354148865
+      },
+      "native_binding_0.2_epoch018": {
+        "MR-mAP-Full_Avg": 58.54823383439398,
+        "MR-mAP-Full_Avg-AUX": 59.373623176391234,
+        "MR-mAP-Full_Avg-COMB": 60.297074620648736,
+        "MR-R1-Full_0.5": 76.06452178955078,
+        "MR-R1-Full_0.7": 63.16129684448242,
+        "MR-R1-Full_mIoU": 0.7105023527284421,
+        "MR-mAP-Long_Avg": 64.44459653780211,
+        "MR-mAP-Middle_Avg": 59.11116812625435,
+        "MR-mAP-Short_Avg": 21.002195787017218,
+        "HL-HIT@1-VeryGood": 75.54839324951172,
+        "HL-mAP-VeryGood": 0.4569283425807953
+      },
+      "native_binding_0.2_delta_from_baseline": {
+        "MR-mAP-Full_Avg": 0.14730072984989562,
+        "MR-mAP-Full_Avg-AUX": -0.23380187887579496,
+        "MR-mAP-Full_Avg-COMB": -0.08572784543925849,
+        "MR-R1-Full_0.5": -0.32257843017578125,
+        "MR-R1-Full_0.7": 0.06451797485351562,
+        "MR-R1-Full_mIoU": -0.0010390767272003831,
+        "MR-mAP-Long_Avg": 0.46768016149548686,
+        "MR-mAP-Middle_Avg": -0.8604044688814767,
+        "MR-mAP-Short_Avg": 1.0908974072664535,
+        "HL-HIT@1-VeryGood": 0.5161361694335938,
+        "HL-mAP-VeryGood": 0.0015985071659088135
+      },
+      "native_binding_0.4_epoch018": {
+        "MR-mAP-Full_Avg": 58.21910393452484,
+        "MR-mAP-Full_Avg-AUX": 59.40438366290364,
+        "MR-mAP-Full_Avg-COMB": 60.14395590117768,
+        "MR-R1-Full_0.5": 76.45161437988281,
+        "MR-R1-Full_0.7": 62.967742919921875,
+        "MR-R1-Full_mIoU": 0.7066632113521285,
+        "MR-mAP-Long_Avg": 64.20036917205907,
+        "MR-mAP-Middle_Avg": 58.87840121245295,
+        "MR-mAP-Short_Avg": 20.529639345809983,
+        "HL-HIT@1-VeryGood": 75.22581481933594,
+        "HL-mAP-VeryGood": 0.45794185996055603
+      },
+      "native_binding_0.4_delta_from_baseline": {
+        "MR-mAP-Full_Avg": -0.18182917001924892,
+        "MR-mAP-Full_Avg-AUX": -0.2030413923633887,
+        "MR-mAP-Full_Avg-COMB": -0.2388465649103182,
+        "MR-R1-Full_0.5": 0.06451416015625,
+        "MR-R1-Full_0.7": -0.12903594970703125,
+        "MR-R1-Full_mIoU": -0.004878218103513965,
+        "MR-mAP-Long_Avg": 0.22345279575244348,
+        "MR-mAP-Middle_Avg": -1.0931713826828755,
+        "MR-mAP-Short_Avg": 0.6183409660592183,
+        "HL-HIT@1-VeryGood": 0.1935577392578125,
+        "HL-mAP-VeryGood": 0.0026120245456695557
+      }
+    }
+  },
+  "conclusion": "Native Binding does not provide a stable core MR-mAP gain across official test and validation; coefficient 0.2 improves validation, while coefficient 0.4 is effectively tied on official test."
 }
